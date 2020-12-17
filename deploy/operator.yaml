@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anzo-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: anzo-operator
+  template:
+    metadata:
+      labels:
+        name: anzo-operator
+    spec:
+      serviceAccountName: anzo-operator
+      containers:
+        - name: anzo-operator
+          # Replace this with the built image name
+          image: us.gcr.io/cloud-sandbox-1162/cambridgesemantics/anzo-operator:1.1.0
+          command:
+          - anzo-operator
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "anzo-operator"
+            #- name: RELATED_IMAGE_ANZO
+            #  value: us.gcr.io/cloud-sandbox-1162/cambridgesemantics/anzo:5.1.2
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+            requests:
+              cpu: "0.25"
+              memory: "128Mi"

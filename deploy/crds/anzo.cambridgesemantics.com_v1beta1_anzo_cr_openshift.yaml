@@ -1,0 +1,18 @@
+apiVersion: anzo.cambridgesemantics.com/v1beta1
+kind: Anzo
+metadata:
+  name: a02
+spec:
+  size: 1
+
+  serviceAccountName: anzo-operator
+
+  resources:
+    requests:
+      cpu: "2000m"
+      memory: "7340M"
+    limits:
+      cpu: "2000m"
+      memory: "7340M"
+
+  role: AnzoAgent
