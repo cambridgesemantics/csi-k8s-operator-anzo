@@ -16,7 +16,7 @@ spec:
             app: anzo
         spec:
           containers:
-          - image: registry.connect.redhat.com/cambridgesemantics/anzo:5.2.2
+          - image: registry.connect.redhat.com/cambridgesemantics/anzo:5.3.9
             name: anzo
             resources:
               limits:
