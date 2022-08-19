@@ -5,7 +5,7 @@
 ## Prerequisites
 
 * Red Hat Openshift Container Platform on Kubernetes, version >= 4.3
-* Kubectl, versions {1.20-1.16}
+* Kubectl, versions {1.22-1.16}
 * Anzo Operator Subscription
 
 ## Optional Prerequisites
