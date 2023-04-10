@@ -15,6 +15,7 @@ The Anzo Agent works in concert with the Microservice Leader and Anzo Unstructur
 
 | Release | Tags                                       |
 | :---:   | :---                                       |
+|  2.0.3   |  2.0.3, 2.0.3-{{ build }}  |
 |  2.0.2   |  2.0.2, 2.0.2-{{ build }}  |
 |  2.0.1   |  2.0.1, 2.0.1-{{ build }}  |
 |  2.0.0   |  2.0.0, 2.0.0-{{ build }}  |
@@ -22,8 +23,8 @@ The Anzo Agent works in concert with the Microservice Leader and Anzo Unstructur
 
 ## Prerequisites
 
-* Kubernetes cluster, versions {1.22-1.16}
-* Kubectl, versions {1.22-1.16}
+* Kubernetes cluster, versions {1.24-1.16}
+* Kubectl, versions {1.24-1.16}
 
 ## Setting up prerequisites
 
