@@ -3,6 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.12.1
+  creationTimestamp: null
   name: anzos.anzo.cambridgesemantics.com
 spec:
   group: anzo.cambridgesemantics.com
@@ -7568,3 +7569,9 @@ spec:
     storage: true
     subresources:
       status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null
