@@ -15,6 +15,7 @@ The Anzo Agent works in concert with the Microservice Leader and Anzo Unstructur
 
 | Release | Tags                                       |
 | :---:   | :---                                       |
+|  2.0.5   |  2.0.5, 2.0.5-{{ build }}  |
 |  2.0.4   |  2.0.4, 2.0.4-{{ build }}  |
 |  2.0.3   |  2.0.3, 2.0.3-{{ build }}  |
 |  2.0.2   |  2.0.2, 2.0.2-{{ build }}  |
