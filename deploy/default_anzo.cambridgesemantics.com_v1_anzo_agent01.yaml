@@ -16,7 +16,7 @@ spec:
             app: anzo
         spec:
           containers:
-          - image: registry.connect.redhat.com/cambridgesemantics/anzo@sha256:af0fe5361938ef891432796b45aa409ff4367adf42bf33cd8dac3edf3bcb6e47
+          - image: registry.connect.redhat.com/cambridgesemantics/anzo@sha256:fef8a4c71313db6f1213b54157abf5099be67fe93aa75178753ceaacef0458e4
             name: anzo
             resources:
               limits:

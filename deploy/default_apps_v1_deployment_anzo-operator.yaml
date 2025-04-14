@@ -26,8 +26,10 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: RELATED_IMAGE_ANZO
-          value: registry.connect.redhat.com/cambridgesemantics/anzo@sha256:af0fe5361938ef891432796b45aa409ff4367adf42bf33cd8dac3edf3bcb6e47
-        image: registry.connect.redhat.com/cambridgesemantics/anzo-operator@sha256:45f082056d6bb8a88cbcdf8ee30021de757e39ddfe71ccbf2dfd8e54159c53e0
+          value: registry.connect.redhat.com/cambridgesemantics/anzo@sha256:fef8a4c71313db6f1213b54157abf5099be67fe93aa75178753ceaacef0458e4
+        - name: RELATED_IMAGE_ANZO_OPERATOR
+          value: registry.connect.redhat.com/cambridgesemantics/anzo-operator@sha256:31095ade21132850a973d09a7256897417ca1acf278c0a0b22920eec1ddc39db
+        image: registry.connect.redhat.com/cambridgesemantics/anzo-operator@sha256:31095ade21132850a973d09a7256897417ca1acf278c0a0b22920eec1ddc39db
         imagePullPolicy: Always
         name: manager
         securityContext:
