@@ -1,0 +1,90 @@
+apiVersion: anzo.cambridgesemantics.com/v1
+kind: Anzo
+metadata:
+  name: a10
+spec:
+  nodeConfig:
+    spec:
+      replicas: 1
+      serviceName: anzo-a10
+      selector:
+        matchLabels:
+          app: "anzo"
+      template:
+        metadata:
+          labels:
+            app: "anzo"
+        spec:
+          serviceAccountName: anzo-operator
+          containers:
+          - name: anzo
+            image: cambridgesemantics/anzo:5.3.1
+            resources:
+              requests:
+                cpu: "4000m"
+                memory: "12Gi"
+            volumeMounts:
+            - mountPath: /cache
+              name: cache-volume
+            - mountPath: /dir2
+              name: log-dir
+          - name: logger
+            image: cambridgesemantics/fluent-bit:1.7.2
+            resources:
+              requests:
+                cpu: "2"
+                memory: "1500Mi"
+            imagePullPolicy: Always
+            volumeMounts:
+            - mountPath: /dir2
+              name: log-dir
+          volumes:
+          - name: cache-volume
+            emptyDir: {}
+          - name: log-dir
+            emptyDir: {}
+          tolerations:
+          - effect: NoSchedule
+            key: cambridgesemantics.com/dedicated
+            operator: Equal
+            value: anzograph
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: cambridgesemantics.com/node-purpose
+                    operator: In
+                    values:
+                    - anzograph
+  volumes:
+  - name: nfs1
+    mountPath: "/opt/nfs1"
+    pv:
+      capacity:
+        storage: 5Gi
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: ""
+      persistentVolumeReclaimPolicy: Retain
+      nfs:
+        path: "/nfsshare"
+        server: 192.168.1.2
+        readOnly: false
+    pvc:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: ""
+      resources:
+        requests:
+          storage: 2Gi
+  service:
+    metadata:
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+  role: AnzoServer
+  jsonActivation: false
+  #jvmMemory: 256m
+  #credentials: mysecret1
+  macID: ""
+  license: ""

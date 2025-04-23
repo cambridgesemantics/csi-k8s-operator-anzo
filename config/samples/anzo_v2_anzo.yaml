@@ -1,0 +1,93 @@
+apiVersion: anzo.cambridgesemantics.com/v2
+kind: Anzo
+metadata:
+  name: anzo-sample
+  annotations:
+    cambridgesemantics.com/skip-lb-check: "false"
+spec:
+  nodeConfig:
+    spec:
+      replicas: 1
+      serviceName: anzo-a10
+      selector:
+        matchLabels:
+          app: "anzo"
+      template:
+        metadata:
+          labels:
+            app: "anzo"
+        spec:
+          serviceAccountName: anzo-operator
+          containers:
+          - name: anzo
+            image: us.gcr.io/cloud-sandbox-1162/cambridgesemantics/anzo:5.4.3
+            resources:
+              requests:
+                cpu: "4000m"
+                memory: "12Gi"
+            volumeMounts:
+            - mountPath: /k8s-activation-properties/cmap-config
+              name: cmap-config
+          volumes:
+          - configMap:
+              name: cmap-config
+            name: cmap-config
+
+          tolerations:
+          - effect: NoSchedule
+            key: cambridgesemantics.com/dedicated
+            operator: Equal
+            value: anzograph
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: cambridgesemantics.com/node-purpose
+                    operator: In
+                    values:
+                    - anzograph
+  service:
+    metadata:
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+  role: AnzoServer
+  jsonActivation: true
+  initJSON: |-
+    {
+    "sysadminUser": "k8s://mysecret/admin_user",
+    "password": "k8s://mysecret/admin_password",
+    "hostname": "localhost",
+    "dn": "k8s-cmap://cmap-config/dn",
+    "logDirBase": "k8s-cmap://cmap-config/logDirBase"
+    }
+  credentials: mysecret
+
+  volumes:
+  - name: nfs1
+    mountPath: "/opt/nfs1"
+    pv:
+      capacity:
+        storage: 5Gi
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: ""
+      persistentVolumeReclaimPolicy: Retain
+      nfs:
+        path: "/nfsshare"
+        server: 192.168.1.2
+        readOnly: false
+    pvc:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: ""
+      resources:
+        requests:
+          storage: 2Gi
+  - name: data-persistence
+    pvc:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 4Gi

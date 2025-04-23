@@ -1,0 +1,125 @@
+apiVersion: anzo.cambridgesemantics.com/v2
+kind: Anzo
+metadata:
+  name: anzo
+  namespace: ns1
+  # annotations:
+  #   cambridgesemantics.com/skip-lb-check: "true"
+spec:
+  nodeConfig:
+    spec:
+      replicas: 1
+      serviceName: anzo
+      selector:
+        matchLabels:
+          app: "anzo"
+      template:
+        metadata:
+          labels:
+            app: "anzo"
+        spec:
+          serviceAccountName: anzo-operator
+          # initContainers:
+          # - name: anzo-init
+          #   image: us.gcr.io/cloud-sandbox-1162/cambridgesemantics/anzo:6.0.0-n202309061800-b20230907110000
+          #   command: ["/usr/sbin/activate"]
+          #   #command: ["sleep"]
+          #   #args: ["60000"]
+          #   resources:
+          #     requests:
+          #       cpu: "1000m"
+          #       memory: "1000Mi"
+          #   imagePullPolicy: Always
+          containers:
+          - name: anzo
+            image: us.gcr.io/cloud-sandbox-1162/cambridgesemantics/anzo:6.0.0-n202401301700-b20240131020000
+            resources:
+              requests:
+                cpu: "1000m"
+                memory: "4000Mi"
+            imagePullPolicy: Always      
+          tolerations:
+          - effect: NoSchedule
+            key: cambridgesemantics.com/dedicated
+            operator: Equal
+            value: anzograph
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: cambridgesemantics.com/node-purpose
+                    operator: In
+                    values:
+                    - anzograph
+  # volumes:
+  # - name: nfs1
+  #   mountPath: "/opt/nfs1"
+  #   pv:
+  #     capacity:
+  #       storage: 5Gi
+  #     accessModes:
+  #     - ReadWriteOnce
+  #     storageClassName: ""
+  #     persistentVolumeReclaimPolicy: Retain
+  #     nfs:
+  #       path: "/var/nfsshare"
+  #       server: 10.104.20.4
+  #       readOnly: false
+  #   pvc:
+  #     accessModes:
+  #     - ReadWriteOnce
+  #     storageClassName: ""
+  #     resources:
+  #       requests:
+  #         storage: 2Gi
+  #service:
+  #  metadata:
+  #    annotations:
+  #      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+  service:
+   metadata:
+     annotations:
+       cloud.google.com/load-balancer-type: "Internal"
+   spec:
+      type: LoadBalancer  
+  certificate:     
+    metadata:
+      name: pkcs12-certs
+      namespace: ns1
+    spec:
+      isCA: false
+      #duration: 1h
+      secretName: pkcs12
+      commonName: what.ever
+      dnsNames:
+        - localhost
+        - anzo-anzo-lb.ns1
+        - anzo-anzo-lb
+      issuerRef:
+  ## Issuer should already exist in your cluster    
+        name: my-ca-issuer
+        #kind: ClusterIssuer
+        group: cert-manager.io
+  ## Keystore section below is part of certificate resource. For anzo we add keystore section to certificate CR in operaotor if it is not specified.
+  ## Operator also creates a secret which stores password required for pkcs12 keystore
+  #     # keystores:
+      #   pkcs12:
+      #     create: true
+      #     passwordSecretRef: # Password used to encrypt the keystore
+      #       key: password
+      #       name: keystorepass
+  role: AnzoServer
+  jsonActivation: true
+  jvmMemory: 4096m
+  credentials: mysecret1
+  initJSON: |-
+    {
+    "sysadminUser": "sysadmin",
+    "hostname": "localhost",
+    "dn": "dc=localhost",
+    "serverId":"0148-3DC4-6140-45E5-901A-4C0N",
+    "licenseEncoded": "-----BEGIN LICENSE-----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-----END LICENSE-----"
+    }
+  # tlsCerts: pkcs12-secret
+  trustBundle: bundle

@@ -1,0 +1,30 @@
+apiVersion: anzo.cambridgesemantics.com/v1
+kind: Anzo
+metadata:
+  name: agent01
+spec:
+  nodeConfig:
+    spec:
+      replicas: 1
+      serviceName: anzo-agent01
+      selector:
+        matchLabels:
+          app: "anzo"
+      template:
+        metadata:
+          labels:
+            app: "anzo"
+        spec:
+          serviceAccountName: anzo-operator
+          containers:
+          - name: anzo
+            image: registry.connect.redhat.com/cambridgesemantics/anzo:5.3.11
+            resources:
+              requests:
+                cpu: "4000m"
+                memory: "12Gi"
+              limits:
+                cpu: "4000m"
+                memory: "12Gi"
+  role: AnzoAgent
+status: {}

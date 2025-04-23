@@ -1,0 +1,145 @@
+# This CR deploys Graph Studio server using Cambridge Semantics(CSI) licensing mode.
+# NOTE: The usage of this mode is strongly discouraged.
+# One needs to contact https://customercenter.cambridgesemantics.com/
+apiVersion: anzo.cambridgesemantics.com/v2
+kind: Anzo
+metadata:
+  name: server-legacy
+spec:
+  jsonActivation: true
+  jvmMemory: 4096m
+  licensing:
+    licenseType: "CSI" 
+  nodeConfig:
+    spec:
+      persistentVolumeClaimRetentionPolicy:
+        whenDeleted: Retain
+      replicas: 1
+      selector:
+        matchLabels:
+          app: anzo
+      serviceName: anzo-server-legacy
+      template:
+        metadata:
+          annotations:
+            cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+          labels:
+            app: anzo
+        spec:
+          tolerations:
+          - effect: NoSchedule
+            key: cambridgesemantics.com/dedicated
+            operator: Equal
+            value: anzograph
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: cambridgesemantics.com/node-purpose
+                    operator: In
+                    values:
+                    - anzograph
+          containers:
+          - env:
+            - name: INSTALL4J_ADD_VM_PARAMS
+              value: ' -Dcom.cambridgesemantics.anzo.licensemanager.licenseFileLocation=/opt/anzo/Server/configuration/license-lic/license.lic '
+            image: cambridgesemantics/anzo:6.0.0
+            imagePullPolicy: Always
+            name: anzo
+            resources:
+              limits:
+                cpu: "2.0"
+                memory: 8.0Gi
+              requests:
+                cpu: "2.0"
+                memory: 8.0Gi
+            volumeMounts:
+            - mountPath: /k8s-startup-data/activation
+              name: persistence-volume
+              subPath: activation
+            - mountPath: /opt/anzo/Server/data
+              name: persistence-volume
+              subPath: data
+            - mountPath: /opt/anzo/Server/logs
+              name: persistence-volume
+              subPath: logs
+            - mountPath: /opt/anzo/Server/configuration/license-lic
+              name: persistence-volume
+              subPath: configuration/license-lic
+            - mountPath: /opt/anzo/Server/data/anzowtcache
+              name: anzowtcache-volume
+          initContainers:
+          - env:
+            - name: INSTALL4J_ADD_VM_PARAMS
+              value: ' -Dcom.cambridgesemantics.anzo.licensemanager.licenseFileLocation=/opt/anzo/Server/configuration/license-lic/license.lic '
+            name: anzo-init
+            resources:
+              limits:
+                cpu: "0.5"
+                memory: 2Gi
+              requests:
+                cpu: "0.5"
+                memory: 2Gi
+            volumeMounts:
+            - mountPath: /opt/anzo/Server/data
+              name: persistence-volume
+              subPath: data
+            - mountPath: /opt/anzo/Server/data/anzowtcache
+              name: anzowtcache-volume
+            - mountPath: /opt/anzo/Server/configuration/license-lic
+              name: persistence-volume
+              subPath: configuration/license-lic
+            - mountPath: /k8s-startup-data/activation
+              name: persistence-volume
+              subPath: activation
+          securityContext:
+            fsGroup: 1001
+          serviceAccountName: anzo-operator
+          volumes:
+          - emptyDir: {}
+            name: anzowtcache-volume
+      volumeClaimTemplates:
+      - metadata:
+          name: persistence-volume
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
+  role: AnzoServer
+  service:
+    metadata:
+      annotations:
+        cloud.google.com/load-balancer-type: "Internal"
+    spec:
+     ports:
+     - name: http
+       port: 80
+       protocol: TCP
+       targetPort: 8080
+     - name: https
+       port: 443
+       protocol: TCP
+       targetPort: 8443
+     - name: admin-http
+       port: 8945
+       protocol: TCP
+       targetPort: 8945
+     - name: admin-https
+       port: 8946
+       protocol: TCP
+       targetPort: 8946
+     - name: osgi-console
+       port: 8022
+       protocol: TCP
+       targetPort: 8022
+     - name: combus-nossl
+       port: 61616
+       protocol: TCP
+       targetPort: 61616
+     - name: combus-ssl
+       port: 61617
+       protocol: TCP
+       targetPort: 61617

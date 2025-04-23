@@ -1,0 +1,43 @@
+apiVersion: anzo.cambridgesemantics.com/v2
+kind: Anzo
+metadata:
+  name: agent
+spec:
+  jsonActivation: false
+  jvmMemory: 900m
+  nodeConfig:
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          cluster_name: agent
+      serviceName: anzo-agent   
+      template:
+        metadata:
+          annotations:
+            cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+          labels:
+            cluster_name: agent
+        spec:
+          containers:
+          - env:
+            - name: APP
+              value: ANZO
+            - name: INSTALL4J_ADD_VM_PARAMS
+              value: ' -Djava.util.prefs.userRoot=/opt/anzo/Server/data/prefs '
+            image: cambridgesemantics/anzo:6.0.0
+            imagePullPolicy: IfNotPresent
+            name: anzo
+            resources:
+              limits:
+                cpu: "500m"
+                memory: "1000Mi"
+              requests:
+                cpu: "500m"
+                memory: "1000Mi"
+  role: AnzoAgent
+  service:
+    metadata:
+      annotations:
+        cloud.google.com/load-balancer-type: Internal
+

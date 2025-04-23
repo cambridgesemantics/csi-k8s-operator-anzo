@@ -1,0 +1,226 @@
+Name:         0ew9ea1ycx4fj
+Namespace:    1000000028
+Labels:       <none>
+Annotations:  cambridgesemantics.com/skip-lb-check: true
+              cambridgesemantics.com/use-vault: true
+              cambridgesemantics.com/vault-addr: http://vault.vault.svc.cluster.local:8200/
+              cambridgesemantics.com/vault-k8s-auth-path: kubernetes
+              cambridgesemantics.com/vault-kv-mount-path: kgx
+              cambridgesemantics.com/vault-kv-version: 1
+              cambridgesemantics.com/vault-role-name: anzo-operator-role
+              cambridgesemantics.com/vault-secret-path: workspaces/1000000028/0ew9ea1ycx4fj/operator
+API Version:  anzo.cambridgesemantics.com/v2
+Kind:         Anzo
+Metadata:
+  Creation Timestamp:  2024-02-06T03:23:42Z
+  Generation:          1
+  Resource Version:    117388178
+  UID:                 758b09dc-b3b3-4037-8737-9cb7986d21bc
+Spec:
+  Ingress:
+    Metadata:
+      Annotations:
+        alb.ingress.kubernetes.io/backend-protocol:    HTTPS
+        alb.ingress.kubernetes.io/certificate-arn:     arn:aws:acm:us-east-1:613756607483:certificate/a94b6e3a-b51f-423c-ad30-199b55e7d7f8
+        alb.ingress.kubernetes.io/group.name:          1000000028
+        alb.ingress.kubernetes.io/listen-ports:        [{"HTTPS":443}]
+        alb.ingress.kubernetes.io/load-balancer-name:  1000000028
+        alb.ingress.kubernetes.io/scheme:              internal
+        alb.ingress.kubernetes.io/ssl-policy:          ELBSecurityPolicy-2016-08
+        alb.ingress.kubernetes.io/success-codes:       200-399
+        alb.ingress.kubernetes.io/tags:                cambridgesemantics.com/workspace-id=1000000028
+        alb.ingress.kubernetes.io/target-type:         ip
+        external-dns.alpha.kubernetes.io/hostname:     0ew9ea1ycx4fj-1000000028.portal.dev50.k19s.io
+      Name:                                            0ew9ea1ycx4fj
+      Namespace:                                       1000000028
+    Spec:
+      Ingress Class Name:  alb
+      Rules:
+        Host:  0ew9ea1ycx4fj-1000000028.portal.dev50.k19s.io
+        Http:
+          Paths:
+            Backend:
+              Service:
+                Name:  anzo-0ew9ea1ycx4fj-lb
+                Port:
+                  Name:  https
+            Path:        /
+            Path Type:   Prefix
+  Init JSON:             {
+"vaultType": "Hashicorp",
+"licenseEncoded": "-----BEGIN LICENSE-----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-----END LICENSE-----",
+"vaultKubernetesPath": "kubernetes",
+"dn": "dc=localhost",
+"vaultUrl": "http://vault.vault.svc.cluster.local:8200/",
+"serverId": "0148-3DC4-6140-45E5-901A-4C0N",
+"vaultEngineVersion": "1",
+"authMode": "EXTERNAL_KEYCLOAK",
+"vaultAnzoPropertiesBasePath": "kgx/workspaces/1000000028/0ew9ea1ycx4fj/anzo",
+"hostname": "anzo-0ew9ea1ycx4fj-0.anzo-0ew9ea1ycx4fj.1000000028.svc.cluster.local",
+"vaultKubernetesRole": "anzo-role",
+"vaultBasePath": "kgx/workspaces/1000000028",
+"sysadminUser": "sysadmin",
+"additionalConfigurations":{
+  "com.cambridgesemantics.anzo.admin.keycloak.server" : {
+    "org.openanzo.services.enabled":"false",
+    "org.openanzo.security.ldap.enabled":"false",
+    "service.pid":"com.cambridgesemantics.anzo.admin.keycloak.server"
+    },
+  "com.cambridgesemantics.anzo.usermanagement.scim.ScimUserManagementImpl" :{
+    "org.openanzo.services.enabled":"false",
+    "com.cambridgesemantics.anzo.usermanagement.scim.enabled":"false",
+    "service.pid":"com.cambridgesemantics.anzo.usermanagement.scim.ScimUserManagementImpl"
+    },
+  "com.cambridgesemantics.anzo.config.ldap.LdapManagementService": {
+    "org.openanzo.services.enabled":"false",
+    "org.openanzo.security.ldap.enabled":"false",
+    "service.pid":"com.cambridgesemantics.anzo.config.ldap.LdapManagementService"
+    },
+  "com.cambridgesemantics.anzo.usermanagement.keycloak.KeycloakUserManagementImpl": {
+    "service.pid": "com.cambridgesemantics.anzo.usermanagement.keycloak.KeycloakUserManagementImpl",
+    "org.openanzo.services.enabled": "true",
+    "com.cambridgesemantics.anzo.usermanagement.keycloak.url": "https://oidc.portal.dev50.k19s.io",
+    "com.cambridgesemantics.anzo.usermanagement.keycloak.clientId": "0ew9ea1ycx4fj",
+    "com.cambridgesemantics.anzo.usermanagement.keycloak.clientSecret": "vault:{ \"entryPath\":\"kgx/workspaces/1000000028/keycloak/0ew9ea1ycx4fj\" , \"key\":\"0ew9ea1ycx4fj\" }",
+    "com.cambridgesemantics.anzo.usermanagement.keycloak.masterRealm": "1000000028",
+    "com.cambridgesemantics.anzo.usermanagement.keycloak.clientRealm": "1000000028",
+    "com.cambridgesemantics.anzo.usermanagement.keycloak.enabled": "true",
+    "com.cambridgesemantics.anzo.usermanagement.keycloak.anzoClientId": "0ew9ea1ycx4fj",
+    "com.cambridgesemantics.anzo.usermanagement.keycloak.anzoCliClientId": "0ew9ea1ycx4fj",
+    "com.cambridgesemantics.anzo.usermanagement.keycloak.embedded": "false"
+    }
+},
+"extendedConfigurations": {
+  "org.ops4j.pax.web:default": {
+    "org.osgi.service.http.isformlogindisplayed": "false"
+    },
+  "com.cambridgesemantics.akka.embedded": {
+    "akka.remote.artery.canonical.hostname": "anzo-0ew9ea1ycx4fj-0.anzo-0ew9ea1ycx4fj.1000000028.svc.cluster.local"
+    }
+  }
+}
+  Json Activation:  true
+  Jvm Memory:       4096m
+  Node Config:
+    Spec:
+      Persistent Volume Claim Retention Policy:
+        When Deleted:  Retain
+      Replicas:        1
+      Selector:
+        Match Labels:
+          App:       anzo
+      Service Name:  0ew9ea1ycx4fj
+      Template:
+        Metadata:
+          Annotations:
+            cluster-autoscaler.kubernetes.io/safe-to-evict:  false
+          Labels:
+            App:  anzo
+        Spec:
+          Affinity:
+            Node Affinity:
+              Required During Scheduling Ignored During Execution:
+                Node Selector Terms:
+                  Match Expressions:
+                    Key:       cambridgesemantics.com/workspace-id
+                    Operator:  In
+                    Values:
+                      1000000028
+          Containers:
+            Env:
+              Name:             INSTALL4J_ADD_VM_PARAMS
+              Value:             -Dcom.cambridgesemantics.anzo.licensemanager.licenseFileLocation=/opt/anzo/Server/data/license.lic 
+            Image:              613756607483.dkr.ecr.us-east-1.amazonaws.com/cambridgesemantics/anzo:6.0.0-latest-nightly
+            Image Pull Policy:  Always
+            Liveness Probe:
+              Failure Threshold:  1
+              Http Get:
+                Path:                            /statusStarted
+                Port:                            8946
+                Scheme:                          HTTPS
+              Initial Delay Seconds:             30
+              Period Seconds:                    30
+              Success Threshold:                 1
+              Termination Grace Period Seconds:  300
+              Timeout Seconds:                   5
+            Name:                                anzo
+            Resources:
+              Limits:
+                Cpu:     2.0
+                Memory:  8.0Gi
+              Requests:
+                Cpu:     2.0
+                Memory:  8.0Gi
+            Startup Probe:
+              Failure Threshold:  50
+              Http Get:
+                Path:           /statusStarted
+                Port:           8946
+                Scheme:         HTTPS
+              Period Seconds:   10
+              Timeout Seconds:  30
+            Volume Mounts:
+              Mount Path:  /opt/anzo/Server/data
+              Name:        data-volume
+              Sub Path:    data
+              Mount Path:  /opt/anzo/Server/logs
+              Name:        data-volume
+              Sub Path:    logs
+              Mount Path:  /opt/anzo/Server/data/anzowtcache
+              Name:        anzowtcache-volume
+          Init Containers:
+            Name:  anzo-init
+            Resources:
+              Limits:
+                Cpu:     0.5
+                Memory:  2Gi
+              Requests:
+                Cpu:     0.5
+                Memory:  2Gi
+            Volume Mounts:
+              Mount Path:  /opt/anzo/Server/data
+              Name:        data-volume
+              Sub Path:    data
+              Mount Path:  /opt/anzo/Server/data/anzowtcache
+              Name:        anzowtcache-volume
+          Security Context:
+            Fs Group:            1001
+          Service Account Name:  anzo
+          Tolerations:
+            Effect:    NoSchedule
+            Key:       cambridgesemantics.com/workspace-id
+            Operator:  Equal
+            Value:     1000000028
+            Effect:    NoSchedule
+            Key:       node.kubernetes.io/instance-type
+            Operator:  Equal
+            Value:     m5n.xlarge
+            Effect:    NoSchedule
+            Key:       cambridgesemantics.com/dedicated
+            Operator:  Equal
+            Value:     dynamic
+          Volumes:
+            Empty Dir:
+            Name:  anzowtcache-volume
+      Volume Claim Templates:
+        Metadata:
+          Name:  data-volume
+        Spec:
+          Access Modes:
+            ReadWriteOnce
+          Resources:
+            Requests:
+              Storage:  25Gi
+  Role:                 AnzoServer
+  Service:
+    Metadata:
+      Annotations:
+        service.beta.kubernetes.io/aws-load-balancer-internal:  true
+    Spec:
+      Type:  NodePort
+Status:
+  Message:         Cluster is in 'Running' state
+  Phase:           Running
+  Ready Replicas:  1
+  Reason:          ClusterRunning
+Events:            <none>

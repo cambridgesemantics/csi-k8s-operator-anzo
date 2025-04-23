@@ -1,0 +1,167 @@
+apiVersion: anzo.cambridgesemantics.com/v2
+kind: Anzo
+metadata:
+  name: lic-proxy
+spec:
+  jsonActivation: true
+  jvmMemory: 4096m
+  licensing:
+    licenseType: "AltairOne"
+    altairOne:
+      licenseServer: "6200@192.168.1.4"
+      proxy:
+        credentials:
+          username: "test-graph-studio"
+          password: "test-graph-studio-password"
+        host: "192.168.1.2"
+        port: "3128"
+  nodeConfig:
+    spec:
+      persistentVolumeClaimRetentionPolicy:
+        whenDeleted: Retain
+      replicas: 1
+      selector:
+        matchLabels:
+          app: anzo
+      serviceName: anzo-lic-proxy
+      template:
+        metadata:
+          annotations:
+            cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+          labels:
+            app: anzo
+        spec:
+          tolerations:
+          - effect: NoSchedule
+            key: cambridgesemantics.com/dedicated
+            operator: Equal
+            value: dynamic
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: cambridgesemantics.com/node-purpose
+                    operator: In
+                    values:
+                    - dynamic
+          containers:
+          - image: cambridgesemantics/anzo:6.0.0
+            imagePullPolicy: Always
+            name: anzo
+            resources:
+              limits:
+                cpu: "2.0"
+                memory: 8.0Gi
+              requests:
+                cpu: "2.0"
+                memory: 8.0Gi
+            volumeMounts:
+            - mountPath: /k8s-startup-data/activation
+              name: persistence-volume
+              subPath: activation
+            - mountPath: /opt/anzo/Server/data
+              name: persistence-volume
+              subPath: data
+            - mountPath: /opt/anzo/Server/logs
+              name: persistence-volume
+              subPath: logs
+            - mountPath: /opt/anzo/Server/data/anzowtcache
+              name: anzowtcache-volume
+          initContainers:
+          - name: anzo-init
+            resources:
+              limits:
+                cpu: "0.5"
+                memory: 2Gi
+              requests:
+                cpu: "0.5"
+                memory: 2Gi
+            volumeMounts:
+            - mountPath: /opt/anzo/Server/data
+              name: persistence-volume
+              subPath: data
+            - mountPath: /opt/anzo/Server/data/anzowtcache
+              name: anzowtcache-volume
+            - mountPath: /k8s-startup-data/activation
+              name: persistence-volume
+              subPath: activation
+          securityContext:
+            fsGroup: 1001
+          serviceAccountName: anzo-operator
+          volumes:
+          - emptyDir: {}
+            name: anzowtcache-volume
+      volumeClaimTemplates:
+      - metadata:
+          name: persistence-volume
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
+  role: AnzoServer
+  service:
+    metadata:
+      annotations:
+        cloud.google.com/load-balancer-type: "Internal"
+    spec:
+     ports:
+     - name: http
+       port: 80
+       protocol: TCP
+       targetPort: 8080
+     - name: https
+       port: 443
+       protocol: TCP
+       targetPort: 8443
+     - name: admin-http
+       port: 8945
+       protocol: TCP
+       targetPort: 8945
+     - name: admin-https
+       port: 8946
+       protocol: TCP
+       targetPort: 8946
+     - name: osgi-console
+       port: 8022
+       protocol: TCP
+       targetPort: 8022
+     - name: combus-nossl
+       port: 61616
+       protocol: TCP
+       targetPort: 61616
+     - name: combus-ssl
+       port: 61617
+       protocol: TCP
+       targetPort: 61617
+
+  initJSON: |-
+    {
+    "dn": "dc=localhost",
+    "hostname": "anzo-lic-proxy-0.anzo-lic-proxy.default.svc.cluster.local",
+    "extendedConfigurations": {
+      "com.cambridgesemantics.anzo.unstructured.distributed.DistributedPipeline": {
+        "com.cambridgesemantics.anzo.unstructured.distributed.statusUpdateInterval": "1000",
+        "com.cambridgesemantics.anzo.unstructured.distributed.anzoAgentSpinupTimeout": "450000",
+        "com.cambridgesemantics.anzo.unstructured.distributed.defaultNumStatusJournalGlobalLimit": "-1",
+        "com.cambridgesemantics.anzo.unstructured.distributed.defaultStatusJournalBasePath": "${system.ANZO_SERVER_HOME}/data",
+        "com.cambridgesemantics.anzo.unstructured.distributed.enforceDocStatusQueueLimit": "false",
+        "com.cambridgesemantics.anzo.unstructured.distributed.isAnzoAgent": "false",
+        "com.cambridgesemantics.anzo.unstructured.distributed.network.servername": "anzo-lic-proxy-0.anzo-lic-proxy.default.svc.cluster.local",
+        "com.cambridgesemantics.anzo.unstructured.distributed.network.useSslIfEnabled": "true",
+        "com.cambridgesemantics.anzo.unstructured.distributed.pauseRequestsWhileJournalUpdates": "true",
+        "com.cambridgesemantics.anzo.unstructured.distributed.statusUpdateDocQueueSize": "10000",
+        "com.cambridgesemantics.anzo.unstructured.distributed.unprocessedRequestLimit": "5000",
+        "org.openanzo.datasource.datasourceURI": "http://openanzo.org/datasource/systemDatasource",
+        "org.openanzo.services.enabled": "true"
+      },
+      "org.ops4j.pax.web:default": {
+        "org.osgi.service.http.isformlogindisplayed": "false"
+      },
+      "com.cambridgesemantics.akka.embedded": {
+        "akka.remote.artery.canonical.hostname": "anzo-lic-proxy-0.anzo-lic-proxy.default.svc.cluster.local"
+      }
+    }
+    }

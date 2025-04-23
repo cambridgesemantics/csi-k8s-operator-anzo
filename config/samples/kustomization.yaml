@@ -1,0 +1,4 @@
+## Append samples you want in your CSV to this file as resources ##
+resources:
+- anzo_v2_anzo_openshift.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples

@@ -1,0 +1,64 @@
+apiVersion: anzobackup.cambridgesemantics.com/v1beta1
+kind: AnzoBackup
+metadata:
+  name: anzo-sample-bkp
+spec:
+  sourceCRName: mn2
+  preBackupCommands:
+  - /sbin/su-exec anzo /opt/anzo/Server/AnzoServer stop
+  volumeSnapshotClass:
+    metadata:
+      name: testanzo-sample
+      namespace: default
+      annotations:
+        cambridgesemantics.com/retention-period: "0"
+        cambridgesemantics.com/keep-backup-after-retention-expiry: "true"
+        anno1: annoval1
+      labels:
+        test1: testval1
+    #driver: ebs.csi.aws.com
+    driver: pd.csi.storage.gke.io
+    deletionPolicy: Retain
+  volumeSnapshot:
+    metadata:
+      name: testanzo-sample
+      annotations:
+        cambridgesemantics.com/retention-period: "0"
+        cambridgesemantics.com/keep-backup-after-retention-expiry: "true"
+        anno2: annoval2
+      labels:
+        test2: testval2
+    spec:
+      volumeSnapshotClassName: testanzo-sample
+      source:
+        persistentVolumeClaimName: data-persistence-anzo-sample-0
+  retentionCron:
+    metadata:
+      name: testanzo-sample
+      namespace: default
+    spec:
+      schedule: "*/5 * * * *"
+      jobTemplate:
+        spec:
+          template:
+            spec:
+              serviceAccountName: anzo-operator
+              containers:
+              - name: delete-resources
+                image: us.gcr.io/cloud-sandbox-1162/cambridgesemantics/anzo-backup-cron:1.0.0
+                env:
+                - name: SOURCE_CR_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: RETENTION_NUMBER
+                  value: "0"
+                - name: SOURCE_CR_NAME
+                  value: mn2
+                imagePullPolicy: Always
+                terminationMessagePath: /dev/termination-log
+                terminationMessagePolicy: File
+                tty: true
+                command: ["/bin/bash"]
+                args: ["-c", "/manager"]
+              restartPolicy: OnFailure

@@ -1,0 +1,45 @@
+apiVersion: anzo.cambridgesemantics.com/v2
+kind: Anzo
+metadata:
+  name: no-persistence
+spec:
+  jsonActivation: true
+  jvmMemory: 4096m
+  nodeConfig:
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: anzo
+      serviceName: anzo-no-persistence
+      template:
+        metadata:
+          annotations:
+            cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+          labels:
+            app: anzo
+        spec:
+          containers:
+          - image: registry.connect.redhat.com/cambridgesemantics/anzo@sha256:sha256:e118056c3ced55806a2b2af74de44d2e4bf0b622b810d4827968b24d9d98c422
+            imagePullPolicy: Always
+            name: anzo
+            resources:
+              limits:
+                cpu: "2.0"
+                memory: 8.0Gi
+              requests:
+                cpu: "2.0"
+                memory: 8.0Gi
+          initContainers:
+          - name: anzo-init
+            resources:
+              limits:
+                cpu: "0.5"
+                memory: 2Gi
+              requests:
+                cpu: "0.5"
+                memory: 2Gi
+          securityContext:
+            fsGroup: 1001
+          serviceAccountName: anzo-operator
+  role: AnzoServer

@@ -1,0 +1,265 @@
+<html>
+<style>
+code {
+  font-family: Consolas,"courier new";
+  color: crimson;
+  background-color: #f1f1f1;
+  padding: 2px;
+  font-size: 105%;
+}
+
+h3 {
+  display:inline;
+}
+
+</style>
+<body>
+<h2>Graph Studio Operator (anzo-operator)</h2>
+<h3>By Altair Engineering Inc.</h3>
+<a href="https://altair.com/altair-graph-studio">About [Graph Studio]</a>
+<h2>View In the Red Hat Ecosystem Catalog</h2>
+<p><a href="https://catalog.redhat.com/software/containers/5ff71c98ac3db90370a2774b?architecture=amd64&tag=latest">latest</a></p>
+<h2 style="display:inline">Project Status: </h2><a>stable</a><br>
+<h2 style="display:inline">Operator API Version: </h2><a>v2</a>
+<h2>Prerequisites</h2>
+<ul>
+  <li>Red Hat Openshift Container Platform on Kubernetes, version >= 4.9</li>
+  <li>Kubectl, versions {1.31-1.15}</li>
+</ul>  
+<h2>Anzo Docker Images Used for Deployment</h2>
+<p>When you deploy Graph Studio using operator, following are the set of images used for actual deployments. We have given reference docker commands to download the latest releases for each of them below.</p>
+
+<h3>Graph Studio Operator</h3>
+<p>To download latest release, please use: <code>docker pull registry.connect.redhat.com/cambridgesemantics/anzo-operator</code></p>
+<h3>Graph Studio</h3>
+<p>To download latest release, please use: <code>docker pull registry.connect.redhat.com/cambridgesemantics/anzo</code></p>
+<h2>Steps to deploy Graph Studio(Anzo) operator</h2>
+<p>For deploying Graph Studio operator and CRs managed by it, user needs to enable RBAC and configure kubernetes objects mentioned below.</p>
+<code>
+<ul>
+	<li># Create Namespace, mention namespace in metadata.name<br>
+	kubectl create -f deploy/v1_namespace_default.yaml</li>
+	<li># Setup Service Account<br>
+        kubectl create -f deploy/default_v1_serviceaccount_anzo-operator.yaml --namespace <namespace></li>
+	<li># Setup RBAC<br>
+	kubectl create -f deploy/default_rbac.authorization.k8s.io_v1_role_anzo-operator.yaml  --namespace <namespace><br>
+	kubectl create -f deploy/default_rbac.authorization.k8s.io_v1_rolebinding_anzo-operator.yaml  --namespace <namespace><br>
+	kubectl create -f deploy/rbac.authorization.k8s.io_v1_clusterrole_anzo-operator.yaml<br>
+	kubectl create -f deploy/default_rbac.authorization.k8s.io_v1_rolebinding_anzo-operator-clusterrole.yaml  --namespace <namespace></li>
+	<li># Setup the CRD<br>
+	kubectl create -f deploy/crds/apiextensions.k8s.io_v1_customresourcedefinition_anzos.anzo.cambridgesemantics.com.yaml<br>
+	kubectl create -f deploy/crds/apiextensions.k8s.io_v1_customresourcedefinition_anzobackups.anzobackup.cambridgesemantics.com.yaml</li>
+	<li># Deploy anzo-operator<br>
+	kubectl create -f deploy/default_apps_v1_deployment_anzo-operator.yaml --namespace <namespace></li>
+	<li># Deploy Graph Studio Custom Resource(CR), i.e. Graph Studio deployment<br>
+	kubectl apply -f deploy/default_anzo.cambridgesemantics.com_v1_anzo_agent01.yaml --namespace <namespace></li>
+</ul>
+</code>
+<b>NOTE: One needs to edit operator deployment, CR deployment with right docker image details.</b>
+<h2>Steps to delete Graph Studio CR and operator</h2>
+<code>
+<ul>
+	<li># Delete Graph Studio CR<br>
+	kubectl delete -f deploy/default_anzo.cambridgesemantics.com_v1_anzo_agent01.yaml --namespace <namespace></li>
+	<li># Delete anzo-operator<br>
+	kubectl delete -f deploy/default_apps_v1_deployment_anzo-operator.yaml --namespace <namespace></li>
+	<li># Delete RBAC
+	kubectl delete -f deploy/default_rbac.authorization.k8s.io_v1_role_anzo-operator.yaml --namespace <namespace><br>
+	kubectl delete -f deploy/default_rbac.authorization.k8s.io_v1_rolebinding_anzo-operator.yaml --namespace <namespace><br>
+	kubectl delete -f deploy/rbac.authorization.k8s.io_v1_clusterrole_anzo-operator.yaml --namespace <namespace><br>
+	kubectl delete -f deploy/default_rbac.authorization.k8s.io_v1_rolebinding_anzo-operator-clusterrole.yaml  --namespace <namespace></li>
+	<li># Delete Service Account<br>
+	kubectl delete -f deploy/default_v1_serviceaccount_anzo-operator.yaml --namespace <namespace></li>
+	<li># Delete CRD<br>
+	kubectl delete -f deploy/crds/apiextensions.k8s.io_v1_customresourcedefinition_anzos.anzo.cambridgesemantics.com.yaml<br>
+	kubectl delete -f deploy/crds/apiextensions.k8s.io_v1_customresourcedefinition_anzobackups.anzobackup.cambridgesemantics.com.yaml</li>
+</ul>
+</code>
+
+<h2>Graph Studio CustomResource(CR) Specification</h2>
+<p>The following table lists the configurable parameters for Graph Studio and their default values.(CR API Version: v2)</p>
+<table>
+<tr>
+	<th>Parameter</th>
+	<th>Description</th>
+	<th>DEfault</th>
+</tr>
+<tr>
+	<td><code>metadata.name<code></td>
+	<td>Name of CR</td>
+	<td>anzo-sample</td>
+</tr>
+<tr>
+        <td><code>metadata.namespace<code></td>
+        <td>Namespace of CR</td>
+        <td></td>
+</tr>
+<tr>
+        <td><code>metadata.labels<code></td>
+        <td>Dictionary of (key: val) as labels of CR</td>
+        <td></td>
+</tr>
+<tr>
+        <td><code>spec.nodeConfig.spec<code></td>
+        <td>Configuration specification for Graph Studio</td>
+        <td></td>
+</tr>
+<tr>
+        <td><code>spec.nodeConfig.spec.replicas<code></td>
+        <td>Number of pods for Graph studio Agent or Server</td>
+        <td>1</td>
+</tr>
+<tr>
+        <td><code>spec.nodeConfig.spec.serviceName<code></td>
+        <td>Name of headless service for Graph Studio</td>
+	<td>anzo-<metadata.name></td>
+</tr>
+<tr>
+        <td><code>spec.nodeConfig.spec.template.spec.serviceAccountName<code></td>
+        <td>Service account name for pods</td>
+        <td>anzo-operator</td>
+</tr>
+<tr>
+        <td><code>spec.nodeConfig.spec.template.spec.containers.x.Name<code></td>
+        <td>Name of Graph Studio container</td>
+        <td>anzo</td>
+</tr>
+<tr>
+	<td><code>spec.service<code></td>
+	<td>LoadBalancer, NodePort or ClusterIP service attributes, of type v1.Service</td>
+	<td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+        <td><code>spec.volumes<code></td>
+        <td>List of persistent volumes</td>
+        <td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+        <td><code>spec.volumes.[i].name<code></td>
+        <td>Name for persistent volume</td>
+        <td></td>
+</tr>
+<tr>
+        <td><code>spec.volumes.[i].mountPath<code></td>
+        <td>Path where persistent volume should be mounted inside container</td>
+        <td></td>
+</tr>
+<tr>
+        <td><code>spec.volumes.[i].pv<code></td>
+        <td>Attributes to configure persistent volume, of type v1.PersistentVolume</td>
+        <td></td>
+</tr>
+<tr>
+        <td><code>spec.volumes.[i].pvc<code></td>
+        <td>Attributes to configure persistent volume claim, of type v1.PersistentVolumeClaim</td>
+	<td></td>
+</tr>
+<tr>
+        <td><code>spec.volumes.[i].deletePVC<code></td>
+        <td>Set this to true if you want to delete PVC after CR deletion</td>
+        <td>false</td>
+</tr>
+<tr>
+        <td><code>spec.role<code></td>
+        <td>Role of Graph Studio, AnzoAgent or AnzoServer</td>
+        <td></td>
+</tr>
+
+<tr>
+	<td><code>spec.credentials<code></td>
+	<td>Existing credentials for AnzoAgent or AnzoServer</td>
+	<td></td>
+</tr>
+<tr>
+        <td><code>spec.jsonActivation<code></td>
+        <td>Set this to true if Graph studio should be bootstrapped using JSON data file</td>
+        <td></td>
+</tr>
+<tr>
+        <td><code>spec.bootProperties`<code></td>
+        <td>Dictinary having <filename: filecontent> combination to configure boot properties at installation</td>
+        <td></td>
+</tr>
+<tr>
+        <td><code>spec.jvmMemory<code></td>
+	<td>Amount of memory that should be given for JVM processing</td>
+        <td>(Pod Memory - 1204M)</td>
+</tr>
+<tr>
+        <td><code>spec.licensing<code></td>
+        <td>User provided licensing information</td>
+        <td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+        <td><code>spec.licensing.licenseType<code></td>
+        <td>license type to use, AltairOne or CSI</td>
+	<td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+        <td><code>spec.licensing.altairOne<code></td>
+	<td>AltairOne licensing information</td>
+        <td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+        <td><code>spec.licensing.altairOne.authCode<code></td>
+        <td>AltairOne authentication code</td>
+	<td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+	<td><code>spec.licensing.altairOne.credentials<code></td>
+	<td>AltairOne credentials</td>
+	<td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+        <td><code>spec.licensing.altairOne.credentials.username<code></td>
+        <td>AltairOne username</td>
+        <td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+        <td><code>spec.licensing.altairOne.credentials.password<code></td>
+        <td>AltairOne password</td>
+        <td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+        <td><code>spec.licensing.altairOne.licenseFile<code></td>
+        <td>AltairOne license file</td>
+        <td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+        <td><code>spec.licensing.altairOne.licenseServer<code></td>
+        <td>AltairOne internal license server</td>
+        <td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+        <td><code>spec.licensing.altairOne.proxy<code></td>
+        <td>AltairOne licensing proxy details</td>
+	<td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+        <td><code>spec.licensing.altairOne.proxy.credentials<code></td>
+        <td>AltairOne license proxy credentials</td>
+        <td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+        <td><code>spec.licensing.altairOne.proxy.credentials.username<code></td>
+        <td>AltairOne license proxy username</td>
+        <td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+        <td><code>spec.licensing.altairOne.proxy.credentials.password<code></td>
+        <td>AltairOne license proxy password</td>
+        <td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+        <td><code>spec.licensing.altairOne.proxy.host<code></td>
+        <td>AltairOne license proxy host</td>
+        <td>commented, please uncomment to add value</td>
+</tr>
+<tr>
+        <td><code>spec.licensing.altairOne.proxy.port<code></td>
+        <td>AltairOne license proxy port</td>
+        <td>commented, please uncomment to add value</td>
+</tr>
+</table>
+</body>
+</html>
